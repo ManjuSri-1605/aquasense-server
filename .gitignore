@@ -1,7 +1,9 @@
 ﻿node_modules/
+frontend/node_modules/
 model/
 *.joblib
 .env
+frontend/.env
 __pycache__/
 *.pyc
 .DS_Store
