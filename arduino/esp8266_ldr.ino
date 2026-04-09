@@ -16,15 +16,15 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecureBearSSL.h>
 #include <ArduinoJson.h>
 
 // ── CONFIG — edit these ───────────────────────────────────────
 const char* WIFI_SSID     = "Manju";
 const char* WIFI_PASSWORD = "abcd1234";
 
-// Your PC's WiFi IP — ESP8266 must be on the same WiFi network
-const char* SERVER_URL    = "http://172.17.3.225:8000/data";
+// Live Render backend — ESP8266 sends data here over the internet
+const char* SERVER_URL    = "https://aquasense-server-1-nc1c.onrender.com/data";
 
 const int   LDR_PIN       = A0;
 const int   SEND_INTERVAL = 10000; // ms between readings
@@ -73,7 +73,8 @@ void loop() {
   Serial.printf("[Sensor] LDR = %d  →  %s\n", ldrValue, status.c_str());
 
   if (WiFi.status() == WL_CONNECTED) {
-    WiFiClient client;
+    BearSSL::WiFiClientSecure client;
+    client.setInsecure(); // skip SSL cert check (fine for project use)
     HTTPClient http;
 
     http.begin(client, SERVER_URL);
