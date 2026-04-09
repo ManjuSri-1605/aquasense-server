@@ -17,6 +17,22 @@ function classify(ldr) {
   return              { label: 'High',  confidence: 0.85 };
 }
 
+// ── GET / (homepage so Render URL looks good) ────────────────
+app.get('/', (req, res) => {
+  res.json({
+    name: 'AquaSense API',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      'POST /data':       'Send LDR reading from ESP8266',
+      'GET  /latest':     'Get latest reading',
+      'GET  /history?n=': 'Get last N readings',
+      'GET  /stats':      'Get session statistics',
+      'GET  /health':     'Health check',
+    }
+  });
+});
+
 // ── POST /data  (ESP8266 sends here) ─────────────────────────
 app.post('/data', (req, res) => {
   const ldr = parseFloat(req.body.ldr);
