@@ -11,9 +11,22 @@ const readings = [];
 const MAX = 200;
 
 // ── Classification ────────────────────────────────────────────
+// Uses percentage of max observed value so it works for any LDR range.
+// Higher LDR = more light passing through = cleaner water.
+let maxObserved = 0;
+
 function classify(ldr) {
-  if (ldr >= 700) return { label: 'Clean', confidence: 0.90 };
-  if (ldr >= 450) return { label: 'Low',   confidence: 0.80 };
+  // Track the highest reading seen (= cleanest / most light)
+  if (ldr > maxObserved) maxObserved = ldr;
+
+  // Use absolute thresholds if we have enough data, else use raw value
+  // Based on typical LDR in water: clean ~80-120, low ~40-79, high ~0-39
+  // These are auto-scaled based on your sensor's actual max
+  const baseline = Math.max(maxObserved, 100); // at least 100 to avoid div/0
+  const pct = (ldr / baseline) * 100;
+
+  if (pct >= 70) return { label: 'Clean', confidence: 0.90 };
+  if (pct >= 40) return { label: 'Low',   confidence: 0.80 };
   return              { label: 'High',  confidence: 0.85 };
 }
 
@@ -72,6 +85,7 @@ app.get('/stats', (req, res) => {
     min: Math.min(...ldrs),
     max: Math.max(...ldrs),
     avg: Math.round(ldrs.reduce((a, b) => a + b, 0) / ldrs.length),
+    maxObserved,
   });
 });
 
