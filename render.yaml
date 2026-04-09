@@ -1,9 +1,9 @@
 services:
   - type: web
     name: aquasense-api
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
     envVars:
-      - key: MODEL_PATH
-        value: model/rf_model.joblib
+      - key: PORT
+        value: 8000
